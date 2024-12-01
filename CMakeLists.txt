@@ -44,11 +44,13 @@ add_library(
   moveit_open_manipulator_x
   SHARED
   hardware/omx_hardware.cpp
+  controller/omx_controller.cpp
 )
 
 target_compile_features(moveit_open_manipulator_x PUBLIC cxx_std_17)
 target_include_directories(moveit_open_manipulator_x PUBLIC
 $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/hardware/include>
+$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/controller/include>
 $<INSTALL_INTERFACE:include/moveit_open_manipulator_x>
 )
 ament_target_dependencies(
@@ -60,6 +62,8 @@ ament_target_dependencies(
 
 # Export hardware plugins
 pluginlib_export_plugin_description_file(hardware_interface moveit_open_manipulator_x.xml)
+# Export controller plugins
+pluginlib_export_plugin_description_file(controller_interface moveit_open_manipulator_x.xml)
 
 install(
   DIRECTORY hardware/include/
