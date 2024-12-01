@@ -13,6 +13,7 @@
 #include "control_msgs/msg/joint_trajectory_controller_state.hpp"
 #include "controller_interface/controller_interface.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
+#include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp/duration.hpp"
 #include "rclcpp/subscription.hpp"
 #include "rclcpp/time.hpp"
@@ -69,6 +70,7 @@ public:
     const rclcpp_lifecycle::State & previous_state) override;
 
 protected:
+  rclcpp_action::Server<control_msgs::action::FollowJointTrajectory>::SharedPtr action_server_;
   std::vector<std::string> joint_names_;
   std::vector<std::string> command_interface_types_;
   std::vector<std::string> state_interface_types_;

@@ -14,6 +14,8 @@
 #include "rclcpp_lifecycle/state.hpp"
 
 using config_type = controller_interface::interface_configuration_type;
+using FollowJointTrajectory = control_msgs::action::FollowJointTrajectory;
+using GoalHandleFollowJointTrajectory = rclcpp_action::ServerGoalHandle<FollowJointTrajectory>;
 
 namespace moveit_open_manipulator_x
 {
@@ -67,6 +69,25 @@ controller_interface::InterfaceConfiguration RobotController::state_interface_co
   return conf;
 }
 
+
+rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const FollowJointTrajectory::Goal> goal){
+  (void)uuid;
+  (void)goal;
+  RCLCPP_INFO(rclcpp::get_logger("server"), "GoalResponse handle_goal");
+  return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+}
+
+rclcpp_action::CancelResponse handle_cancel(const std::shared_ptr<GoalHandleFollowJointTrajectory> goal_handle){
+  (void)goal_handle;
+  RCLCPP_INFO(rclcpp::get_logger("server"), "GoalResponse handle_cancel");
+  return rclcpp_action::CancelResponse::ACCEPT;
+}
+
+void handle_accepted(const std::shared_ptr<GoalHandleFollowJointTrajectory> goal_handle){
+  (void)goal_handle;
+  RCLCPP_INFO(rclcpp::get_logger("server"), "GoalResponse handle_accepted");
+}
+
 controller_interface::CallbackReturn RobotController::on_configure(const rclcpp_lifecycle::State &)
 {
   auto callback =
@@ -76,24 +97,28 @@ controller_interface::CallbackReturn RobotController::on_configure(const rclcpp_
     new_msg_ = true;
     std::cout << "이이이이이이이이" << std::endl;
     std::cout << "이이이이이이이이" << std::endl;
-    std::cout << "이이이이이이이이" << std::endl;
-    std::cout << "이이이이이이이이" << std::endl;
-    std::cout << "이이이이이이이이" << std::endl;
-    std::cout << "RobotController on_configure callback" << std::endl;
     std::cout << "RobotController on_configure callback" << std::endl;
   };
   
+  std::cout << "이이이이이이이이" << std::endl;
+  std::cout << "이이이이이이이이" << std::endl;
 
   joint_command_subscriber_ =
     get_node()->create_subscription<trajectory_msgs::msg::JointTrajectory>(
       "~/joint_trajectory", rclcpp::SystemDefaultsQoS(), callback);
 
+  action_server_ = rclcpp_action::create_server<FollowJointTrajectory>(
+    get_node()->get_node_base_interface(), get_node()->get_node_clock_interface(),
+    get_node()->get_node_logging_interface(), get_node()->get_node_waitables_interface(),
+    std::string(get_node()->get_name()) + "/follow_joint_trajectory",
+    handle_goal,
+    handle_cancel,
+    handle_accepted
+  );
 
-  _action_server = rclcpp_action::create_server<Fibonacci>(
-            this, "fibonacci",
-            std::bind(&ActionServer::handle_goal, this, _1, _2),
-            std::bind(&ActionServer::handle_cancel, this, _1),
-            std::bind(&ActionServer::handle_accepted, this, _1));
+  std::cout << "이이이이이이이이aaa" << std::endl;
+  std::cout << "이이이이이이이이aaa  " << get_node()->get_name() <<std::endl;
+  
   return CallbackReturn::SUCCESS;
 }
 
