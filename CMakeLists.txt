@@ -89,7 +89,7 @@ install(TARGETS moveit_open_manipulator_x
 
 install(
   TARGETS send_trajectory
-  RUNTIME DESTINATION lib/ros2_control_demo_example_7
+  RUNTIME DESTINATION lib/moveit_open_manipulator_x
 )
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}
   PATTERN "setup_assistant.launch" EXCLUDE)

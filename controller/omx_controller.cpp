@@ -6,7 +6,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "rclcpp/qos.hpp"
 #include "rclcpp/time.hpp"
@@ -21,8 +20,6 @@ RobotController::RobotController() : controller_interface::ControllerInterface()
 
 controller_interface::CallbackReturn RobotController::on_init()
 {
-  std::cout << "omx_controller on_init" << std::endl;
-
   // should have error handling
   joint_names_ = auto_declare<std::vector<std::string>>("joints", joint_names_);
   command_interface_types_ =
@@ -39,7 +36,6 @@ controller_interface::CallbackReturn RobotController::on_init()
 controller_interface::InterfaceConfiguration RobotController::command_interface_configuration()
   const
 {
-  std::cout << "omx_controller command_interface_configuration" << std::endl;
   controller_interface::InterfaceConfiguration conf = {config_type::INDIVIDUAL, {}};
 
   conf.names.reserve(joint_names_.size() * command_interface_types_.size());
@@ -78,7 +74,6 @@ controller_interface::CallbackReturn RobotController::on_configure(const rclcpp_
     traj_msg_external_point_ptr_.writeFromNonRT(traj_msg);
     new_msg_ = true;
   };
-  std::cout << "on_configure" << std::endl;
 
   joint_command_subscriber_ =
     get_node()->create_subscription<trajectory_msgs::msg::JointTrajectory>(

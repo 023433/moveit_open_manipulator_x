@@ -105,6 +105,10 @@ def generate_launch_description():
         moveit_config.robot_description,
         str(moveit_config.package_path / "config/ros2_controllers.yaml"),
       ],
+      remappings=[
+        ("~/robot_description", "/robot_description"),
+      ],
+      output="both",
     )
   )
 

@@ -6,7 +6,7 @@
       Robot hardware plugin
     </description>
   </class>
-    <class name="moveit_open_manipulator_x/RobotController"
+  <class name="moveit_open_manipulator_x/RobotController"
          type="moveit_open_manipulator_x::RobotController"
          base_class_type="controller_interface::ControllerInterface">
     <description>
