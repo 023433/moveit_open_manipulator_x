@@ -1,0 +1,9 @@
+<library path="moveit_open_manipulator_x">
+  <class name="moveit_open_manipulator_x/RobotSystem"
+         type="moveit_open_manipulator_x::RobotSystem"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Robot hardware plugin
+    </description>
+  </class>
+</library>
