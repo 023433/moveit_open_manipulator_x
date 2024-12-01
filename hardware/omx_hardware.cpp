@@ -131,6 +131,7 @@ return_type RobotSystem::write(const rclcpp::Time &, const rclcpp::Duration &)
 bool RobotSystem::initWorkbench(const std::string port_name, const uint32_t baud_rate){
   bool result = false;
   const char* log;
+  dxl_wb_ = new DynamixelWorkbench;
 
   result = dxl_wb_->init(port_name.c_str(), baud_rate, &log);
   if(result == false){
