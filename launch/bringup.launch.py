@@ -46,14 +46,14 @@ def generate_launch_description():
 
   ld.add_action(DeclareBooleanLaunchArg("debug", default_value=False))
 
-  ld.add_action(
-    Node(
-      package="tf2_ros",
-      executable="static_transform_publisher",
-      name="static_transform_publisher",
-      output="log",
-    )
-  )
+  # ld.add_action(
+  #   Node(
+  #     package="tf2_ros",
+  #     executable="static_transform_publisher",
+  #     name="static_transform_publisher",
+  #     output="log",
+  #   )
+  # )
 
   ld.add_action(
     Node(

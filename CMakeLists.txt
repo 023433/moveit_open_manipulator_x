@@ -16,6 +16,7 @@ set(HW_IF_INCLUDE_DEPENDS
   rcpputils
   hardware_interface
   dynamixel_workbench_toolbox
+  yaml-cpp
 )
 set(REF_GEN_INCLUDE_DEPENDS
   kdl_parser

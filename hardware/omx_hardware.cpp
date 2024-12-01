@@ -152,51 +152,53 @@ bool RobotSystem::initWorkbench(const std::string port_name, const uint32_t baud
 }
 
 bool RobotSystem::initDynamixels(const std::string yaml_file){
-  YAML::Node dynamixel = YAML::LoadFile(yaml_file.c_str());
+  RCLCPP_ERROR(logger_, "Please check YAML file %s", yaml_file.c_str());
+  // YAML::Node dynamixel = YAML::LoadFile(yaml_file.c_str());
 
-  if(dynamixel.IsNull()){
-    RCLCPP_ERROR(logger_, "Please check YAML file");
-    return false;
-  }
+  // if(dynamixel.IsNull()){
+  //   RCLCPP_ERROR(logger_, "Please check YAML file");
+  //   return false;
+  // }
 
-  for(YAML::const_iterator it_file = dynamixel.begin(); it_file != dynamixel.end(); it_file++){
-    std::string name = it_file->first.as<std::string>();
-    if(name.size() == 0){
-      continue;
-    }
+  // for(YAML::const_iterator it_file = dynamixel.begin(); it_file != dynamixel.end(); it_file++){
+  //   std::string name = it_file->first.as<std::string>();
+  //   if(name.size() == 0){
+  //     continue;
+  //   }
 
-    YAML::Node item = dynamixel[name];
-    for(YAML::const_iterator it_item = item.begin(); it_item != item.end(); it_item++){
-      std::string item_name = it_item->first.as<std::string>();
-      int32_t value = it_item->second.as<int32_t>();
+  //   YAML::Node item = dynamixel[name];
+  //   for(YAML::const_iterator it_item = item.begin(); it_item != item.end(); it_item++){
+  //     std::string item_name = it_item->first.as<std::string>();
+  //     int32_t value = it_item->second.as<int32_t>();
 
-      if(item_name == "ID"){
-        dynamixel_[name] = value;
-      }
+  //     if(item_name == "ID"){
+  //       dynamixel_[name] = value;
+  //     }
 
-      ItemValue item_value = {item_name, value};
-      std::pair<std::string, ItemValue> info(name, item_value);
+  //     ItemValue item_value = {item_name, value};
+  //     std::pair<std::string, ItemValue> info(name, item_value);
 
-      dynamixel_info_.push_back(info);
-    }
-  }
+  //     dynamixel_info_.push_back(info);
+  //   }
+  // }
 
-  const char* log;
-  bool result = false;
+  // const char* log;
+  // bool result = false;
 
-  for(auto const& dxl:dynamixel_){
-    uint16_t model_number = 0;
-    result = dxl_wb_->ping((uint8_t)dxl.second, &model_number, &log);
+  // for(auto const& dxl:dynamixel_){
+  //   uint16_t model_number = 0;
+  //   result = dxl_wb_->ping((uint8_t)dxl.second, &model_number, &log);
     
-    if(result == false){
-      RCLCPP_ERROR(logger_, "%s", log);
-      RCLCPP_ERROR(logger_, "Can't find Dynamixel ID '%d'", dxl.second);
-      return result;
-    }
+  //   if(result == false){
+  //     RCLCPP_ERROR(logger_, "%s", log);
+  //     RCLCPP_ERROR(logger_, "Can't find Dynamixel ID '%d'", dxl.second);
+  //     return result;
+  //   }
 
-    RCLCPP_INFO(logger_, "Name : %s, ID : %d, Model Number : %d", dxl.first.c_str(), dxl.second, model_number);
-  }
+  //   RCLCPP_INFO(logger_, "Name : %s, ID : %d, Model Number : %d", dxl.first.c_str(), dxl.second, model_number);
+  // }
 
+  return true;
 }
 
 
