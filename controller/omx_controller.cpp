@@ -150,9 +150,6 @@ controller_interface::CallbackReturn RobotController::on_configure(const rclcpp_
     handle_accepted
   );
 
-  std::cout << "이이이이이이이이aaa" << std::endl;
-  std::cout << "이이이이이이이이aaa  " << get_node()->get_name() <<std::endl;
-  
   return CallbackReturn::SUCCESS;
 }
 

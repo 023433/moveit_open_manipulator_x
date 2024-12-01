@@ -1,16 +1,25 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="open_manipulator_x">
-    <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
+  <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
 
-    <!-- Import open_manipulator_x urdf file -->
-    <xacro:include filename="$(find open_manipulator_x_description)/urdf/open_manipulator_x.urdf.xacro" />
+  <!-- Import open_manipulator_x urdf file -->
+  <xacro:include filename="$(find open_manipulator_x_description)/urdf/open_manipulator_x.urdf.xacro" />
 
-    <!-- Import control_xacro -->
-    <xacro:include filename="open_manipulator_x.ros2_control.xacro" />
+  <!-- Import control_xacro -->
+  <xacro:include filename="open_manipulator_x.ros2_control.xacro" />
 
-    <xacro:arg name="usb_port" default="/dev/ttyUSB0" />
-    <xacro:arg name="baud_rate" default="0" />
+  <xacro:arg name="usb_port" default="/dev/ttyUSB0" />
+  <xacro:arg name="baud_rate" default="1000000" />
+  <xacro:arg name="yaml_file" default="" />
+  <xacro:arg name="interface" default="position" />
 
-    <xacro:open_manipulator_x_ros2_control name="omx" initial_positions_file="$(arg initial_positions_file)" usb_port="$(arg usb_port)" baud_rate="$(arg baud_rate)"/>
+  <xacro:open_manipulator_x_ros2_control 
+    name="omx" 
+    initial_positions_file="$(arg initial_positions_file)" 
+    usb_port="$(arg usb_port)" 
+    baud_rate="$(arg baud_rate)" 
+    yaml_file="$(arg yaml_file)"
+    interface="$(arg interface)"
+  />
 
 </robot>

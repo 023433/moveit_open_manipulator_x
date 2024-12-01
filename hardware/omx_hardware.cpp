@@ -12,25 +12,28 @@ CallbackReturn RobotSystem::on_init(const hardware_interface::HardwareInfo & inf
     return CallbackReturn::ERROR;
   }
 
-  RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "HardwareInfo name: %s", info.name.c_str());
-  RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "HardwareInfo type: %s", info.type.c_str());
+  auto logger_ = rclcpp::get_logger("handle_goal");
 
-  RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "HardwareInfo usb_port: %s", info_.hardware_parameters["usb_port"].c_str());
-  RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "HardwareInfo baud_rate: %s", info_.hardware_parameters["baud_rate"].c_str());
+  RCLCPP_INFO(logger_, "HardwareInfo name: %s", info.name.c_str());
+  RCLCPP_INFO(logger_, "HardwareInfo type: %s", info.type.c_str());
+
+  RCLCPP_INFO(logger_, "HardwareInfo usb_port: %s", info_.hardware_parameters["usb_port"].c_str());
+  RCLCPP_INFO(logger_, "HardwareInfo baud_rate: %s", info_.hardware_parameters["baud_rate"].c_str());
+  RCLCPP_INFO(logger_, "HardwareInfo yaml_file: %s", info_.hardware_parameters["yaml_file"].c_str());
+  RCLCPP_INFO(logger_, "HardwareInfo interface: %s", info_.hardware_parameters["interface"].c_str());
   
 
   for (const auto & joint_name : info.joints) {
-    RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "joint_name %s / %s", joint_name.name.c_str(), joint_name.type.c_str());
+    RCLCPP_INFO(logger_, "joint_name %s / %s", joint_name.name.c_str(), joint_name.type.c_str());
   }
-  // robot has 6 joints and 2 interfaces
-  joint_position_.assign(6, 0);
-  joint_velocities_.assign(6, 0);
-  joint_position_command_.assign(6, 0);
-  joint_velocities_command_.assign(6, 0);
 
-  // force sensor has 6 readings
-  ft_states_.assign(6, 0);
-  ft_command_.assign(6, 0);
+  joint_position_.assign(5, 0);
+  joint_velocities_.assign(5, 0);
+  joint_position_command_.assign(5, 0);
+  joint_velocities_command_.assign(5, 0);
+
+  ft_states_.assign(5, 0);
+  ft_command_.assign(5, 0);
 
   for (const auto & joint : info_.joints)
   {

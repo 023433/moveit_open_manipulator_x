@@ -1,6 +1,5 @@
 from moveit_configs_utils import MoveItConfigsBuilder
 from launch import LaunchDescription
-from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from moveit_configs_utils.launch_utils import DeclareBooleanLaunchArg
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
@@ -12,6 +11,13 @@ def generate_launch_description():
   # Parameters
   usb_port = LaunchConfiguration('usb_port', default='/dev/ttyUSB0')
   baud_rate = LaunchConfiguration('baud_rate', default='1000000')
+  yaml_file = LaunchConfiguration(
+    'yaml_file', 
+    default=PathJoinSubstitution(
+      [FindPackageShare("moveit_open_manipulator_x"), "config", "hardware.yaml"]
+    )
+  )
+  interface = LaunchConfiguration('interface', default='position')
 
   robot_description_content = Command([
     PathJoinSubstitution([FindExecutable(name="xacro")]),
@@ -25,6 +31,12 @@ def generate_launch_description():
     " ",
     "baud_rate:=",
     baud_rate,
+    " ",
+    "yaml_file:=",
+    yaml_file,
+    " ",
+    "interface:=",
+    interface,
   ])
 
   robot_description = {"robot_description": robot_description_content}

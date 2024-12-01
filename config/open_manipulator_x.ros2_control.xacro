@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <xacro:macro name="open_manipulator_x_ros2_control" params="name initial_positions_file usb_port baud_rate">
+  <xacro:macro name="open_manipulator_x_ros2_control" params="name initial_positions_file usb_port baud_rate yaml_file interface">
     <!-- <xacro:property name="usb_port" value="$(arg usb_port)" default="/dev/ttyUSB0"/> -->
     <xacro:property name="initial_positions" value="${xacro.load_yaml(initial_positions_file)['initial_positions']}"/>
 
@@ -9,6 +9,8 @@
         <plugin>moveit_open_manipulator_x/RobotSystem</plugin>
         <param name="usb_port">${usb_port}</param>
         <param name="baud_rate">${baud_rate}</param>
+        <param name="yaml_file">${yaml_file}</param>
+        <param name="interface">${interface}</param>
       </hardware>
       <joint name="joint1">
         <command_interface name="position"/>
