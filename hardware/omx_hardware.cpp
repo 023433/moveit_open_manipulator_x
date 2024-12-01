@@ -31,12 +31,12 @@ CallbackReturn RobotSystem::on_init(const hardware_interface::HardwareInfo & inf
 
   if(!initWorkbench(port_name_, baud_rate_)){
     RCLCPP_ERROR(logger_, "Please check USB port name");
-    return;
+    return CallbackReturn::ERROR;
   }
 
   if(!initDynamixels(yaml_file_)){
     RCLCPP_ERROR(logger_, "Please check control table (http://emanual.robotis.com/#control-table)");
-    return;
+    return CallbackReturn::ERROR;
   }
 
 
