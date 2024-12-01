@@ -12,6 +12,8 @@
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 
+#include "dynamixel_workbench_toolbox/dynamixel_workbench.h"
+
 using hardware_interface::return_type;
 
 namespace moveit_open_manipulator_x
@@ -32,6 +34,8 @@ public:
   return_type write(const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/) override;
 
 protected:
+  DynamixelWorkbench *dxl_wb_;
+
   /// The size of this vector is (standard_interfaces_.size() x nr_joints)
   std::vector<double> joint_position_command_;
   std::vector<double> joint_velocities_command_;
@@ -41,7 +45,18 @@ protected:
   std::vector<double> ft_command_;
 
   std::unordered_map<std::string, std::vector<std::string>> joint_interfaces = {
-    {"position", {}}, {"velocity", {}}};
+    {"position", {}}, {"velocity", {}}
+  };
+
+private:
+  // ROS Parameters
+  std::string port_name_;
+  int64_t baud_rate_;
+  std::string yaml_file_;
+  std::string interface_;
+
+  bool initWorkbench(const std::string port_name, const uint32_t baud_rate);
+
 };
 
 

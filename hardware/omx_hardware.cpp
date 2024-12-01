@@ -4,6 +4,9 @@
 
 namespace moveit_open_manipulator_x
 {
+
+auto logger_ = rclcpp::get_logger("handle_goal");
+
 CallbackReturn RobotSystem::on_init(const hardware_interface::HardwareInfo & info)
 {
 
@@ -12,7 +15,6 @@ CallbackReturn RobotSystem::on_init(const hardware_interface::HardwareInfo & inf
     return CallbackReturn::ERROR;
   }
 
-  auto logger_ = rclcpp::get_logger("handle_goal");
 
   RCLCPP_INFO(logger_, "HardwareInfo name: %s", info.name.c_str());
   RCLCPP_INFO(logger_, "HardwareInfo type: %s", info.type.c_str());
@@ -22,6 +24,11 @@ CallbackReturn RobotSystem::on_init(const hardware_interface::HardwareInfo & inf
   RCLCPP_INFO(logger_, "HardwareInfo yaml_file: %s", info_.hardware_parameters["yaml_file"].c_str());
   RCLCPP_INFO(logger_, "HardwareInfo interface: %s", info_.hardware_parameters["interface"].c_str());
   
+  std::string port_name = info_.hardware_parameters["usb_port"];
+  uint32_t baud_rate = stoi(info_.hardware_parameters["baud_rate"]);
+
+  initWorkbench(port_name, baud_rate);
+
 
   for (const auto & joint_name : info.joints) {
     RCLCPP_INFO(logger_, "joint_name %s / %s", joint_name.name.c_str(), joint_name.type.c_str());
@@ -120,6 +127,22 @@ return_type RobotSystem::write(const rclcpp::Time &, const rclcpp::Duration &)
 {
   return return_type::OK;
 }
+
+bool RobotSystem::initWorkbench(const std::string port_name, const uint32_t baud_rate){
+  bool result = false;
+  const char* log;
+
+  result = dxl_wb_->init(port_name.c_str(), baud_rate, &log);
+  if(result == false){
+    RCLCPP_ERROR(logger_, "%s", log);
+  }
+
+  return result;
+}
+
+
+
+
 } // namespace moveit_open_manipulator_x
 
 

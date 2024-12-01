@@ -15,6 +15,7 @@ set(HW_IF_INCLUDE_DEPENDS
   pluginlib
   rcpputils
   hardware_interface
+  dynamixel_workbench_toolbox
 )
 set(REF_GEN_INCLUDE_DEPENDS
   kdl_parser
