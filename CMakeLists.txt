@@ -3,10 +3,12 @@ project(moveit_open_manipulator_x)
 
 find_package(ament_cmake REQUIRED)
 
-install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}
-  PATTERN "setup_assistant.launch" EXCLUDE)
-install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
-install(FILES .setup_assistant DESTINATION share/${PROJECT_NAME})
+if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")
+  add_compile_options(-Wall -Wextra)
+endif()
+
+# set the same behavior for windows as it is on linux
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 # find dependencies
 set(HW_IF_INCLUDE_DEPENDS
@@ -39,6 +41,14 @@ endforeach()
 foreach(Dependency IN ITEMS ${CONTROLLER_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach()
+
+## COMPILE
+add_executable(send_trajectory src/send_trajectory.cpp)
+
+ament_target_dependencies(
+  send_trajectory PUBLIC
+  ${REF_GEN_INCLUDE_DEPENDS}
+)
 
 add_library(
   moveit_open_manipulator_x
@@ -76,6 +86,16 @@ install(TARGETS moveit_open_manipulator_x
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
+
+install(
+  TARGETS send_trajectory
+  RUNTIME DESTINATION lib/ros2_control_demo_example_7
+)
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}
+  PATTERN "setup_assistant.launch" EXCLUDE)
+install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
+install(FILES .setup_assistant DESTINATION share/${PROJECT_NAME})
+
 
 ## EXPORTS
 ament_export_targets(export_moveit_open_manipulator_x HAS_LIBRARY_TARGET)
