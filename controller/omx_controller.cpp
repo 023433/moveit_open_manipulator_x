@@ -74,6 +74,46 @@ rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID & uuid, st
   (void)uuid;
   (void)goal;
   RCLCPP_INFO(rclcpp::get_logger("server"), "GoalResponse handle_goal");
+  RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "Received a new goal request.");
+
+  // Print UUID
+  std::ostringstream uuid_stream;
+  for (const auto & byte : uuid) {
+    uuid_stream << std::hex << static_cast<int>(byte);
+  }
+  RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "Goal UUID: %s", uuid_stream.str().c_str());
+
+  // Print trajectory joints
+  RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "Trajectory joint names:");
+  for (const auto & joint_name : goal->trajectory.joint_names) {
+    RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "  %s", joint_name.c_str());
+  }
+
+  // Print trajectory points
+  RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "Trajectory points:");
+  for (size_t i = 0; i < goal->trajectory.points.size(); ++i) {
+    const auto & point = goal->trajectory.points[i];
+    RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "  Point %zu:", i);
+    RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "    Positions:");
+    
+    for (const auto & position : point.positions) {
+      RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "      %f", position);
+    }
+
+    RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "    Velocities:");
+    for (const auto & velocity : point.velocities) {
+      RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "      %f", velocity);
+    }
+
+    RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "    Accelerations:");
+    for (const auto & acceleration : point.accelerations) {
+      RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "      %f", acceleration);
+    }
+
+    RCLCPP_INFO(rclcpp::get_logger("handle_goal"), "    Time from start: %f seconds", rclcpp::Duration(point.time_from_start).seconds());
+  }
+
+
   return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
 }
 
@@ -95,14 +135,8 @@ controller_interface::CallbackReturn RobotController::on_configure(const rclcpp_
   {
     traj_msg_external_point_ptr_.writeFromNonRT(traj_msg);
     new_msg_ = true;
-    std::cout << "이이이이이이이이" << std::endl;
-    std::cout << "이이이이이이이이" << std::endl;
-    std::cout << "RobotController on_configure callback" << std::endl;
   };
   
-  std::cout << "이이이이이이이이" << std::endl;
-  std::cout << "이이이이이이이이" << std::endl;
-
   joint_command_subscriber_ =
     get_node()->create_subscription<trajectory_msgs::msg::JointTrajectory>(
       "~/joint_trajectory", rclcpp::SystemDefaultsQoS(), callback);
