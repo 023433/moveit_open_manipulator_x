@@ -5,6 +5,7 @@
 #include "unordered_map"
 #include "vector"
 
+#include <yaml-cpp/yaml.h>
 #include "rclcpp/rclcpp.hpp"
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
@@ -18,6 +19,12 @@ using hardware_interface::return_type;
 
 namespace moveit_open_manipulator_x
 {
+
+typedef struct _ItemValue{
+  std::string item_name;
+  int32_t value;
+} ItemValue;
+
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
 class HARDWARE_INTERFACE_PUBLIC RobotSystem : public hardware_interface::SystemInterface
@@ -55,7 +62,13 @@ private:
   std::string yaml_file_;
   std::string interface_;
 
+  std::map<std::string, uint32_t> dynamixel_;
+  std::vector<std::pair<std::string, ItemValue>> dynamixel_info_;
+
+
   bool initWorkbench(const std::string port_name, const uint32_t baud_rate);
+  bool initDynamixels(const std::string yaml_file);
+
 
 };
 

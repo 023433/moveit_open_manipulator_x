@@ -24,10 +24,20 @@ CallbackReturn RobotSystem::on_init(const hardware_interface::HardwareInfo & inf
   RCLCPP_INFO(logger_, "HardwareInfo yaml_file: %s", info_.hardware_parameters["yaml_file"].c_str());
   RCLCPP_INFO(logger_, "HardwareInfo interface: %s", info_.hardware_parameters["interface"].c_str());
   
-  std::string port_name = info_.hardware_parameters["usb_port"];
-  uint32_t baud_rate = stoi(info_.hardware_parameters["baud_rate"]);
+  port_name_ = info_.hardware_parameters["usb_port"];
+  baud_rate_ = stoi(info_.hardware_parameters["baud_rate"]);
+  yaml_file_ = info_.hardware_parameters["yaml_file"];
+  interface_ = info_.hardware_parameters["interface"];
 
-  initWorkbench(port_name, baud_rate);
+  if(!initWorkbench(port_name_, baud_rate_)){
+    RCLCPP_ERROR(logger_, "Please check USB port name");
+    return;
+  }
+
+  if(!initDynamixels(yaml_file_)){
+    RCLCPP_ERROR(logger_, "Please check control table (http://emanual.robotis.com/#control-table)");
+    return;
+  }
 
 
   for (const auto & joint_name : info.joints) {
@@ -141,6 +151,53 @@ bool RobotSystem::initWorkbench(const std::string port_name, const uint32_t baud
   return result;
 }
 
+bool RobotSystem::initDynamixels(const std::string yaml_file){
+  YAML::Node dynamixel = YAML::LoadFile(yaml_file.c_str());
+
+  if(dynamixel.IsNull()){
+    RCLCPP_ERROR(logger_, "Please check YAML file");
+    return false;
+  }
+
+  for(YAML::const_iterator it_file = dynamixel.begin(); it_file != dynamixel.end(); it_file++){
+    std::string name = it_file->first.as<std::string>();
+    if(name.size() == 0){
+      continue;
+    }
+
+    YAML::Node item = dynamixel[name];
+    for(YAML::const_iterator it_item = item.begin(); it_item != item.end(); it_item++){
+      std::string item_name = it_item->first.as<std::string>();
+      int32_t value = it_item->second.as<int32_t>();
+
+      if(item_name == "ID"){
+        dynamixel_[name] = value;
+      }
+
+      ItemValue item_value = {item_name, value};
+      std::pair<std::string, ItemValue> info(name, item_value);
+
+      dynamixel_info_.push_back(info);
+    }
+  }
+
+  const char* log;
+  bool result = false;
+
+  for(auto const& dxl:dynamixel_){
+    uint16_t model_number = 0;
+    result = dxl_wb_->ping((uint8_t)dxl.second, &model_number, &log);
+    
+    if(result == false){
+      RCLCPP_ERROR(logger_, "%s", log);
+      RCLCPP_ERROR(logger_, "Can't find Dynamixel ID '%d'", dxl.second);
+      return result;
+    }
+
+    RCLCPP_INFO(logger_, "Name : %s, ID : %d, Model Number : %d", dxl.first.c_str(), dxl.second, model_number);
+  }
+
+}
 
 
 
