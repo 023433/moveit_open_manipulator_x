@@ -45,11 +45,24 @@ def generate_launch_description():
   ld = LaunchDescription()
 
   ld.add_action(DeclareBooleanLaunchArg("debug", default_value=False))
+
   ld.add_action(
-    DeclareBooleanLaunchArg("allow_trajectory_execution", default_value=True)
+    Node(
+      package="tf2_ros",
+      executable="static_transform_publisher",
+      name="static_transform_publisher",
+      output="log",
+    )
   )
+
   ld.add_action(
-    DeclareBooleanLaunchArg("publish_monitored_planning_scene", default_value=True)
+    Node(
+      package="robot_state_publisher",
+      executable="robot_state_publisher",
+      name="robot_state_publisher",
+      output="both",
+      parameters=[moveit_config.robot_description],
+    )
   )
 
   ld.add_action(
@@ -64,6 +77,21 @@ def generate_launch_description():
         },
       ],
       output='screen'
+    )
+  )
+
+  ld.add_action(
+    Node(
+      package="controller_manager",
+      executable="ros2_control_node",
+      parameters=[
+        moveit_config.robot_description,
+        str(moveit_config.package_path / "config/ros2_controllers.yaml"),
+      ],
+      remappings=[
+        ("~/robot_description", "/robot_description"),
+      ],
+      output="both",
     )
   )
 
@@ -97,50 +125,28 @@ def generate_launch_description():
     )
   )
 
+  moveit_config = (
+    MoveItConfigsBuilder("open_manipulator_x", package_name="moveit_open_manipulator_x")
+    .robot_description(file_path="config/open_manipulator_x.urdf.xacro")
+    .trajectory_execution(file_path="config/moveit_controllers.yaml")
+    .planning_scene_monitor(
+      publish_robot_description=True, publish_robot_description_semantic=True
+    )
+    .planning_pipelines(
+      pipelines=["ompl", "chomp", "pilz_industrial_motion_planner"]
+    )
+    .to_moveit_configs()
+  )
+
   ld.add_action(
     Node(
-      package="controller_manager",
-      executable="ros2_control_node",
-      parameters=[
-        moveit_config.robot_description,
-        str(moveit_config.package_path / "config/ros2_controllers.yaml"),
-      ],
-      remappings=[
-        ("~/robot_description", "/robot_description"),
-      ],
-      output="both",
+      package="moveit_ros_move_group",
+      executable="move_group",
+      output="screen",
+      parameters=[moveit_config.to_dict()]
     )
   )
 
-  should_publish = LaunchConfiguration("publish_monitored_planning_scene")
-
-  move_group_configuration = {
-    "publish_robot_description_semantic": True,
-    "allow_trajectory_execution": LaunchConfiguration("allow_trajectory_execution"),
-    "publish_planning_scene": should_publish,
-    "publish_geometry_updates": should_publish,
-    "publish_state_updates": should_publish,
-    "publish_transforms_updates": should_publish,
-    "monitor_dynamics": False,
-  }
-
-  move_group_params = [
-    moveit_config.to_dict(),
-    move_group_configuration,
-  ]
-
-  add_debuggable_node(
-    ld,
-    package="moveit_ros_move_group",
-    executable="move_group",
-    commands_file=str(moveit_config.package_path / "launch" / "gdb_settings.gdb"),
-    output="screen",
-    parameters=move_group_params,
-    extra_debug_args=["--debug"],
-    # Set the display variable, in case OpenGL code is used internally
-    additional_env={"DISPLAY": os.environ["DISPLAY"]},
-  )
-  
   return ld
 
 

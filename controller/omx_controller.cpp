@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "rclcpp/qos.hpp"
 #include "rclcpp/time.hpp"
@@ -73,12 +74,26 @@ controller_interface::CallbackReturn RobotController::on_configure(const rclcpp_
   {
     traj_msg_external_point_ptr_.writeFromNonRT(traj_msg);
     new_msg_ = true;
+    std::cout << "이이이이이이이이" << std::endl;
+    std::cout << "이이이이이이이이" << std::endl;
+    std::cout << "이이이이이이이이" << std::endl;
+    std::cout << "이이이이이이이이" << std::endl;
+    std::cout << "이이이이이이이이" << std::endl;
+    std::cout << "RobotController on_configure callback" << std::endl;
+    std::cout << "RobotController on_configure callback" << std::endl;
   };
+  
 
   joint_command_subscriber_ =
     get_node()->create_subscription<trajectory_msgs::msg::JointTrajectory>(
       "~/joint_trajectory", rclcpp::SystemDefaultsQoS(), callback);
 
+
+  _action_server = rclcpp_action::create_server<Fibonacci>(
+            this, "fibonacci",
+            std::bind(&ActionServer::handle_goal, this, _1, _2),
+            std::bind(&ActionServer::handle_cancel, this, _1),
+            std::bind(&ActionServer::handle_accepted, this, _1));
   return CallbackReturn::SUCCESS;
 }
 

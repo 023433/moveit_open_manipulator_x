@@ -1,14 +1,11 @@
 #include "moveit_open_manipulator_x/omx_hardware.hpp"
 #include <string>
 #include <vector>
-#include <iostream>
 
 namespace moveit_open_manipulator_x
 {
 CallbackReturn RobotSystem::on_init(const hardware_interface::HardwareInfo & info)
 {
-
-  std::cout << "omx_hardware on_init" << std::endl;
 
   if (hardware_interface::SystemInterface::on_init(info) != CallbackReturn::SUCCESS)
   {
@@ -38,7 +35,6 @@ CallbackReturn RobotSystem::on_init(const hardware_interface::HardwareInfo & inf
 
 std::vector<hardware_interface::StateInterface> RobotSystem::export_state_interfaces()
 {
-  std::cout << "omx_hardware export_state_interfaces" << std::endl;
   std::vector<hardware_interface::StateInterface> state_interfaces;
 
   int ind = 0;
