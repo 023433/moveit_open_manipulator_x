@@ -1,46 +1,34 @@
-import os
-
-from ament_index_python.packages import get_package_share_directory
 from moveit_configs_utils import MoveItConfigsBuilder
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-from moveit_configs_utils.launch_utils import (
-    add_debuggable_node,
-    DeclareBooleanLaunchArg,
-)
-from launch.actions import DeclareLaunchArgument
-from launch_ros.parameter_descriptions import ParameterValue
+from moveit_configs_utils.launch_utils import DeclareBooleanLaunchArg
+from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
   moveit_config = MoveItConfigsBuilder("open_manipulator_x", package_name="moveit_open_manipulator_x").to_moveit_configs()
-
+  
   # Parameters
   usb_port = LaunchConfiguration('usb_port', default='/dev/ttyUSB0')
   baud_rate = LaunchConfiguration('baud_rate', default='1000000')
-  param_dir = LaunchConfiguration(
-    'param_dir',
-    default=os.path.join(
-      get_package_share_directory('open_manipulator_x_controller'),
-      'param',
-      'open_manipulator_x_controller_params.yaml'
-    )
-  )
 
-  robot_name = "open_manipulator_x"
-  package_name = robot_name + "_description"
+  robot_description_content = Command([
+    PathJoinSubstitution([FindExecutable(name="xacro")]),
+    " ",
+    PathJoinSubstitution(
+      [FindPackageShare("moveit_open_manipulator_x"), "config", "open_manipulator_x.urdf.xacro"]
+    ),
+    " ",
+    "usb_port:=",
+    usb_port,
+    " ",
+    "baud_rate:=",
+    baud_rate,
+  ])
 
-  urdf_file = os.path.join(
-    get_package_share_directory(package_name),
-    'urdf',
-    robot_name + ".urdf.xacro"
-  )
+  robot_description = {"robot_description": robot_description_content}
 
-  print('urdf_file_name : {}'.format(urdf_file))
-
-  with open(urdf_file, 'r') as infp:
-    robot_desc = infp.read()
 
   ld = LaunchDescription()
 
@@ -61,22 +49,7 @@ def generate_launch_description():
       executable="robot_state_publisher",
       name="robot_state_publisher",
       output="both",
-      parameters=[moveit_config.robot_description],
-    )
-  )
-
-  ld.add_action(
-    Node(
-      package='robot_state_publisher',
-      executable='robot_state_publisher',
-      name='robot_state_publisher',
-      respawn=True,
-      parameters=[
-        {
-          "robot_description": robot_desc,
-        },
-      ],
-      output='screen'
+      parameters=[robot_description],
     )
   )
 
@@ -85,7 +58,7 @@ def generate_launch_description():
       package="controller_manager",
       executable="ros2_control_node",
       parameters=[
-        moveit_config.robot_description,
+        robot_description,
         str(moveit_config.package_path / "config/ros2_controllers.yaml"),
       ],
       remappings=[

@@ -8,7 +8,9 @@
     <!-- Import control_xacro -->
     <xacro:include filename="open_manipulator_x.ros2_control.xacro" />
 
+    <xacro:arg name="usb_port" default="/dev/ttyUSB0" />
+    <xacro:arg name="baud_rate" default="0" />
 
-    <xacro:open_manipulator_x_ros2_control name="omx" initial_positions_file="$(arg initial_positions_file)"/>
+    <xacro:open_manipulator_x_ros2_control name="omx" initial_positions_file="$(arg initial_positions_file)" usb_port="$(arg usb_port)" baud_rate="$(arg baud_rate)"/>
 
 </robot>
